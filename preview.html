@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HollowScan - God Mode Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #050507;
+            --bg-card: #121216;
+            --bg-glass: rgba(18, 18, 22, 0.85);
+
+            --text-main: #FFFFFF;
+            --text-sub: #94A1B2;
+
+            --primary: #7F5AF0;
+            --accent-green: #2CB67D;
+            --accent-orange: #FF8906;
+
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+            --safe-top: 50px;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #F2F2F7;
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --text-main: #1C1C1E;
+            --text-sub: #8A8A8E;
+            --primary: #5932EA;
+            --border: rgba(0, 0, 0, 0.05);
+            --shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* DEVICE */
+        .device {
+            width: 390px;
+            height: 844px;
+            background: var(--bg-body);
+            border-radius: 50px;
+            position: relative;
+            box-shadow: 0 0 0 12px #222, 0 0 0 14px #444, 0 50px 120px rgba(0, 0, 0, 0.7);
+            border: 8px solid #333;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 9999;
+        }
+
+        /* SCREENS */
+        #app-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 110px;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.05);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: var(--bg-body);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .screen::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* HEADER */
+        .header {
+            padding: var(--safe-top) 24px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .brand img {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* HOME CONTENT */
+        .chip-row {
+            padding: 15px 24px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            border-radius: 100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+            transform: scale(1.05);
+        }
+
+        .section-header {
+            padding: 20px 24px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .product-card {
+            margin: 0 24px 24px;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            position: relative;
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+            transition: all 0.3s ease;
+        }
+
+        .product-card.hidden {
+            display: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .p-image {
+            height: 180px;
+            background: var(--bg-body);
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profit-flag {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: var(--accent-green);
+            color: #000;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .p-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .p-store {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .p-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .price-now {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .price-was {
+            font-size: 15px;
+            text-decoration: line-through;
+            color: var(--text-sub);
+        }
+
+        /* SETTINGS UI */
+        .setting-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .setting-row {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .setting-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0 20px;
+        }
+
+        .s-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .s-desc {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 30px;
+            background: var(--bg-body);
+            border-radius: 30px;
+            position: relative;
+            transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 1px solid var(--border);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        /* SPLASH SCREEN */
+        #splash {
+            z-index: 9999;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scanner-container {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .app-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 24px;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: -10%;
+            width: 120%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        .splash-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(to right, #fff, #777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .loading-bar {
+            width: 150px;
+            height: 4px;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            animation: load 2.5s ease-out forwards;
+        }
+
+        @keyframes load {
+            to {
+                width: 100%;
+            }
+        }
+
+        /* NAV BAR */
+        .nav-dock {
+            position: absolute;
+            bottom: 30px;
+            left: 24px;
+            right: 24px;
+            height: 75px;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(25px);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            z-index: 500;
+        }
+
+        [data-theme="light"] .nav-dock {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-item {
+            font-size: 26px;
+            opacity: 0.5;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="device">
+        <div class="notch"></div>
+
+        <!-- SPLASH -->
+        <div id="splash" class="screen active">
+            <div class="scanner-container">
+                <img src="ProductAlerts/Resources/hollowscan_logo.png" class="app-logo">
+                <div class="scan-line"></div>
+            </div>
+            <div class="splash-text">HollowScan</div>
+            <p style="color:#666; font-size:14px; letter-spacing:2px;">INITIALIZING...</p>
+            <div class="loading-bar">
+                <div class="loading-fill"></div>
+            </div>
+        </div>
+
+        <div id="app-content">
+
+            <!-- HOME -->
+            <div id="screen-home" class="screen">
+                <div class="header">
+                    <div class="brand">
+                        <img src="ProductAlerts/Resources/hollowscan_logo.png">
+                        HollowScan
+                    </div>
+                    <div class="theme-btn" onclick="toggleTheme()">☀️</div>
+                </div>
+
+                <div class="chip-row">
+                    <div class="chip active" onclick="filterDeals('all', this)">🔥 For You</div>
+                    <div class="chip" onclick="filterDeals('uk', this)">UK Deals</div>
+                    <div class="chip" onclick="filterDeals('us', this)">US Deals</div>
+                    <div class="chip" onclick="filterDeals('ca', this)">CA Deals</div>
+                </div>
+
+                <div class="section-header" style="margin-top: 10px;">
+                    TRENDING ALERT <span style="font-size:16px">🔥</span>
+                </div>
+
+                <div class="product-card" data-region="uk" style="animation-delay: 0.1s">
+                    <div class="p-image">
+                        🎧
+                        <div class="profit-flag">+29% PROFIT</div>
+                    </div>
+                    <div class="p-title">Sony WH-1000XM5</div>
+                    <div class="p-store">🛒 costco.co.uk • 2m ago</div>
+                    <div class="p-prices">
+                        <div class="price-now">£248.00</div>
+                        <div class="price-was">£349.00</div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-region="uk" style="animation-delay: 0.2s">
+                    <div class="p-image">
+                        👾
+                        <div class="profit-flag">+34% PROFIT</div>
+                    </div>
+                    <div class="p-title">Nintendo Switch OLED</div>
+                    <div class="p-store">🛒 argos.co.uk • 12m ago</div>
+                    <div class="p-prices">
+                        <div class="price-now">£209.00</div>
+                        <div class="price-was">£309.00</div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-region="us" style="animation-delay: 0.3s">
+                    <div class="p-image">
+                        👟
+                        <div class="profit-flag">+50% PROFIT</div>
+                    </div>
+                    <div class="p-title">Nike Dunk Low Retro</div>
+                    <div class="p-store">🛒 footlocker.com • 15m ago</div>
+                    <div class="p-prices">
+                        <div class="price-now">$60.00</div>
+                        <div class="price-was">$120.00</div>
+                    </div>
+                </div>
+
+                <div class="product-card" data-region="ca" style="animation-delay: 0.4s">
+                    <div class="p-image">
+                        ⌚
+                        <div class="profit-flag">+25% PROFIT</div>
+                    </div>
+                    <div class="p-title">Apple Watch Ultra 2</div>
+                    <div class="p-store">🛒 bestbuy.ca • 22m ago</div>
+                    <div class="p-prices">
+                        <div class="price-now">C$949</div>
+                        <div class="price-was">C$1099</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAVED -->
+            <div id="screen-saved" class="screen">
+                <div class="header">
+                    <div class="brand">Saved</div>
+                </div>
+                <div style="padding: 100px 40px; text-align: center; color: var(--text-sub);">
+                    <div style="font-size: 50px; margin-bottom: 20px;">💾</div>
+                    Your saved flips will appear here.
+                </div>
+            </div>
+
+            <!-- PROFILE & SETTINGS -->
+            <div id="screen-profile" class="screen">
+                <div class="header">
+                    <div class="brand">Profile & Settings</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
+                    <div
+                        style="width:100px; height:100px; background:var(--bg-card); border-radius:50%; margin:0 auto 20px; display:flex; justify-content:center; align-items:center; font-size:40px; border:2px solid var(--border); box-shadow: var(--shadow);">
+                        👤</div>
+                    <h2 style="color:var(--text-main);">Josh User</h2>
+                    <p style="color:var(--accent-orange); font-weight:600; font-size:14px; margin-top:5px;">PRO MEMBER
+                        💎</p>
+                </div>
+
+                <!-- Settings Group -->
+                <div style="padding: 0 24px;">
+                    <div
+                        style="font-size:12px; color:var(--text-sub); font-weight:700; margin-bottom:10px; margin-left:10px;">
+                        PUSH NOTIFICATIONS</div>
+
+                    <div class="setting-card">
+                        <div class="setting-row">
+                            <div>
+                                <div class="s-title">New Drops</div>
+                                <div class="s-desc">Get alerted when new items appear</div>
+                            </div>
+                            <div class="toggle active" onclick="toggleSwitch(this)"></div>
+                        </div>
+
+                        <div class="setting-divider"></div>
+
+                        <div class="setting-row">
+                            <div>
+                                <div class="s-title">Price Alerts</div>
+                                <div class="s-desc">When saved items drop in price</div>
+                            </div>
+                            <div class="toggle active" onclick="toggleSwitch(this)"></div>
+                        </div>
+
+                        <div class="setting-divider"></div>
+
+                        <div class="setting-row">
+                            <div>
+                                <div class="s-title">Stock Updates</div>
+                                <div class="s-desc">Restock notifications</div>
+                            </div>
+                            <div class="toggle" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:12px; color:var(--text-sub); font-weight:700; margin:25px 0 10px 10px;">
+                        GENERAL</div>
+
+                    <div class="setting-card">
+                        <div class="setting-row" onclick="toggleTheme()">
+                            <div>
+                                <div class="s-title">Dark Mode</div>
+                                <div class="s-desc">Toggle app theme</div>
+                            </div>
+                            <div class="toggle active" id="theme-toggle-switch"></div>
+                        </div>
+                        <div class="setting-divider"></div>
+                        <div class="setting-row">
+                            <div class="s-title" style="color: #ff4757;">Sign Out</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="nav-dock">
+            <div class="nav-item active" onclick="nav('screen-home', this)">🏠</div>
+            <div class="nav-item" onclick="nav('screen-saved', this)">🔖</div>
+            <div class="nav-item" onclick="nav('screen-profile', this)">👤</div>
+        </div>
+
+    </div>
+
+    <script>
+        // SPLASH LOGIC
+        setTimeout(() => {
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('screen-home').classList.add('active');
+            }, 500);
+        }, 3000);
+
+        // NAV LOGIC
+        function nav(id, el) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // THEME LOGIC
+        function toggleTheme() {
+            const el = document.documentElement;
+            const curr = el.getAttribute('data-theme');
+            const next = curr === 'dark' ? 'light' : 'dark';
+            el.setAttribute('data-theme', next);
+
+            // Sync setting switch
+            const sw = document.getElementById('theme-toggle-switch');
+            if (sw) {
+                if (next === 'dark') sw.classList.add('active');
+                else sw.classList.remove('active');
+            }
+        }
+
+        // TOGGLE LOGIC
+        function toggleSwitch(el) {
+            el.classList.toggle('active');
+        }
+
+        // FILTER LOGIC
+        function filterDeals(region, el) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                const reg = card.getAttribute('data-region');
+                if (region === 'all' || reg === region) {
+                    card.classList.remove('hidden');
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = 'slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards';
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

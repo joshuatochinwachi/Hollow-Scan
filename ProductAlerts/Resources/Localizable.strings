@@ -1,0 +1,29 @@
+/* 
+  Localizable.strings
+  ProductAlerts
+  
+  Created for iOS Product Alert App
+*/
+
+// MARK: - Onboarding
+"onboarding.welcome.title" = "Welcome to Your Personal Deal Hunter";
+"onboarding.welcome.desc" = "Get real-time alerts for profitable products across Amazon, eBay & more";
+"onboarding.button.continue" = "Continue";
+"onboarding.button.start" = "Get Started";
+
+// MARK: - Auth
+"auth.signin.title" = "Welcome Back!";
+"auth.signup.title" = "Create Your Account";
+"auth.email.placeholder" = "Email";
+"auth.password.placeholder" = "Password";
+
+// MARK: - Home
+"home.tab.us" = "US";
+"home.tab.uk" = "UK";
+"home.section.today" = "Todays Best";
+"home.empty.title" = "No deals found";
+
+// MARK: - Subscription
+"sub.plan.monthly" = "Monthly Plan";
+"sub.plan.annual" = "Annual Plan";
+"sub.cta.trial" = "Start Free 7-Day Trial";
